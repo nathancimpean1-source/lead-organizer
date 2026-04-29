@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Leads">
+<title>Lead Importer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f0;
+    --muted: #888;
+    --accent: #e8ff4a;
+    --accent-dark: #b8cc2a;
+    --radius: 14px;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bot: env(safe-area-inset-bottom);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    min-height: 100dvh;
+    padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bot) + 100px);
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  textarea, input[type=text], input[type=date], input[type=password] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    padding: 11px 13px;
+    font-family: inherit;
+    outline: none;
+    -webkit-appearance: none;
+    transition: border-color .15s;
+  }
+  textarea:focus, input:focus { border-color: var(--border2); }
+  textarea { resize: none; min-height: 96px; line-height: 1.5; }
+  input[type=date] { color-scheme: dark; }
+
+  .parsed-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .parsed-field {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 9px 12px;
+  }
+  .parsed-field.full { grid-column: 1 / -1; }
+  .pf-label { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 2px; }
+  .pf-val { font-size: 14px; font-weight: 500; color: var(--text); }
+  .pf-val.empty { color: #555; font-style: italic; font-weight: 400; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .s-btn {
+    padding: 10px 8px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    background: var(--surface2);
+    color: var(--muted);
+  }
+  .s-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,255,74,0.07); }
+
+  .submit {
+    position: fixed;
+    bottom: calc(var(--safe-bot) + 16px);
+    left: 16px;
+    right: 16px;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px;
+    cursor: pointer;
+    letter-spacing: -0.2px;
+    transition: opacity .15s, transform .1s;
+  }
+  .submit:active { transform: scale(0.98); opacity: .85; }
+  .submit:disabled { opacity: .35; }
+
+  .toast {
+    position: fixed;
+    top: calc(var(--safe-top) + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    z-index: 999;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.ok { color: #7fff7f; }
+  .toast.err { color: #ff7f7f; }
+
+  .settings-toggle {
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-bottom: 10px;
+    text-decoration: underline;
+  }
+
+  #settingsCard { display: none; }
+  #settingsCard.open { display: block; }
+
+  .hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .hint a { color: #6af; }
+</style>
+</head>
+<body>
+
+<h1>Lead Importer</h1>
+<p class="subtitle">Paste → tag → push to sheet</p>
+
+<button class="settings-toggle" onclick="toggleSettings()">⚙ Google Sheets setup</button>
+
+<div class="card" id="settingsCard">
+  <label class="label">Google Sheets API Key</label>
+  <input type="password" id="apiKey" placeholder="AIza..." oninput="save()" />
+  <p class="hint">Get a free key at <strong>console.cloud.google.com</strong> → Enable Sheets API → Create API key. See instructions below.</p>
+
+  <label class="label" style="margin-top:12px">Spreadsheet ID</label>
+  <input type="text" id="sheetId" placeholder="1Gd9z85mJ25JvIb-H0VpkegZhbAJ1MArDXSeJGkPdFfA" oninput="save()" />
+  <p class="hint">Your sheet ID is already filled in by default.</p>
+</div>
+
+<div class="card">
+  <label class="label">Paste lead text</label>
+  <textarea id="rawLead" placeholder="Name: John Smith&#10;Address: 123 Main St&#10;Phone: 602-555-1234" oninput="parseLead()"></textarea>
+  <div class="parsed-row" id="parsedRow" style="display:none">
+    <div class="parsed-field"><p class="pf-label">Name</p><p class="pf-val" id="pName">—</p></div>
+    <div class="parsed-field"><p class="pf-label">Phone</p><p class="pf-val" id="pPhone">—</p></div>
+    <div class="parsed-field full"><p class="pf-label">Address</p><p class="pf-val" id="pAddr">—</p></div>
+  </div>
+</div>
+
+<div class="card">
+  <label class="label">Status</label>
+  <div class="status-grid">
+    <button class="s-btn" onclick="setStatus(this, 'Called')">Called</button>
+    <button class="s-btn" onclick="setStatus(this, 'Closed')">Closed</button>
+    <button class="s-btn" onclick="setStatus(this, 'In Talks')">In Talks</button>
+    <button class="s-btn" onclick="setStatus(this, 'Future')">Future</button>
+    <button class="s-btn" onclick="setStatus(this, 'Follow Up')">Follow Up</button>
+    <button class="s-btn" onclick="setStatus(this, 'Not Interested')">Not Interested</button>
+    <button class="s-btn" onclick="setStatus(this, 'N/A')" style="grid-column:1/-1">N/A</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="two-col">
+    <div>
+      <label class="label">Service</label>
+      <input type="text" id="service" placeholder="Window cleaning" />
+    </div>
+    <div>
+      <label class="label">Quote $</label>
+      <input type="text" id="quote" placeholder="350" />
+    </div>
+  </div>
+  <label class="label" style="margin-top:12px">Follow-up date</label>
+  <input type="date" id="fuDate" />
+  <label class="label" style="margin-top:12px">Notes</label>
+  <textarea id="notes" style="min-height:60px" placeholder="Any extra info..."></textarea>
+</div>
+
+<button class="submit" id="submitBtn" onclick="submitLead()">Add to Sheet</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_SHEET_ID = '1Gd9z85mJ25JvIb-H0VpkegZhbAJ1MArDXSeJGkPdFfA';
+let selectedStatus = '';
+
+function load() {
+  document.getElementById('apiKey').value = localStorage.getItem('gs_api_key') || '';
+  document.getElementById('sheetId').value = localStorage.getItem('gs_sheet_id') || DEFAULT_SHEET_ID;
+}
+
+function save() {
+  localStorage.setItem('gs_api_key', document.getElementById('apiKey').value.trim());
+  localStorage.setItem('gs_sheet_id', document.getElementById('sheetId').value.trim() || DEFAULT_SHEET_ID);
+}
+
+function toggleSettings() {
+  const c = document.getElementById('settingsCard');
+  c.classList.toggle('open');
+}
+
+function extract(raw, keys) {
+  for (const k of keys) {
+    const m = raw.match(new RegExp(k + '\\s*[:\\-]\\s*(.+)', 'i'));
+    if (m) return m[1].trim();
+  }
+  return '';
+}
+
+function parseLead() {
+  const raw = document.getElementById('rawLead').value.trim();
+  const row = document.getElementById('parsedRow');
+  if (!raw) { row.style.display = 'none'; return; }
+  row.style.display = 'grid';
+
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    el.textContent = val || '—';
+    el.className = 'pf-val' + (val ? '' : ' empty');
+  };
+  set('pName',  extract(raw, ['name']));
+  set('pPhone', extract(raw, ['phone','cell','number','#']));
+  set('pAddr',  extract(raw, ['address','addr','location']));
+}
+
+function setStatus(btn, s) {
+  selectedStatus = s;
+  document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function today() {
+  return new Date().toLocaleDateString('en-US', { month:'numeric', day:'numeric', year:'numeric' });
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function submitLead() {
+  const apiKey = (localStorage.getItem('gs_api_key') || '').trim();
+  const sheetId = (localStorage.getItem('gs_sheet_id') || DEFAULT_SHEET_ID).trim();
+  const raw = document.getElementById('rawLead').value.trim();
+
+  if (!apiKey) { showToast('Add your Google Sheets API key in settings', 'err'); toggleSettings(); return; }
+  if (!raw)    { showToast('Paste a lead first', 'err'); return; }
+  if (!selectedStatus) { showToast('Pick a status', 'err'); return; }
+
+  const name    = extract(raw, ['name']) || 'Unknown';
+  const phone   = extract(raw, ['phone','cell','number','#']) || '';
+  const address = extract(raw, ['address','addr','location']) || '';
+  const service = document.getElementById('service').value.trim();
+  const rawQuote = document.getElementById('quote').value.trim();
+  const quote   = rawQuote ? (rawQuote.startsWith('$') ? rawQuote : '$' + rawQuote) : '';
+  const fuRaw   = document.getElementById('fuDate').value;
+  const fuDate  = fuRaw ? new Date(fuRaw + 'T12:00:00').toLocaleDateString('en-US') : '';
+  const notes   = document.getElementById('notes').value.trim();
+
+  const row = [today(), name, phone, address, service, quote, selectedStatus, fuDate, notes];
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Adding…';
+
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:I1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS&key=${apiKey}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [row] })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      const msg = err?.error?.message || 'Unknown error';
+      showToast('Error: ' + msg, 'err');
+    } else {
+      showToast('Lead added!', 'ok');
+      document.getElementById('rawLead').value = '';
+      document.getElementById('service').value = '';
+      document.getElementById('quote').value = '';
+      document.getElementById('fuDate').value = '';
+      document.getElementById('notes').value = '';
+      document.getElementById('parsedRow').style.display = 'none';
+      document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
+      selectedStatus = '';
+    }
+  } catch(e) {
+    showToast('Network error — check connection', 'err');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Add to Sheet';
+}
+
+load();
+</script>
+</body>
+</html>
