@@ -9,44 +9,41 @@
 <title>Lead Importer</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
   :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface2: #1e1e1e;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #f0f0f0;
-    --muted: #888;
-    --accent: #e8ff4a;
-    --radius: 14px;
-    --safe-top: env(safe-area-inset-top);
-    --safe-bot: env(safe-area-inset-bottom);
+    --bg: #0a0a0a; --surface: #141414; --surface2: #1e1e1e;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f0; --muted: #888; --accent: #e8ff4a; --radius: 14px;
+    --safe-top: env(safe-area-inset-top); --safe-bot: env(safe-area-inset-bottom);
   }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; min-height: 100dvh; font-size: 16px; overflow-x: hidden; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-    min-height: 100dvh;
-    padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bot) + 100px);
-    font-size: 16px;
+  /* TAB BAR */
+  .tab-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; padding-bottom: var(--safe-bot); z-index: 100;
   }
-
-  h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
-  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
-
-  .label {
-    font-size: 11px; font-weight: 600; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block;
+  .tab-btn {
+    flex: 1; padding: 12px 4px 10px; background: none; border: none;
+    color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; gap: 4px; transition: color .15s;
   }
+  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-btn.active { color: var(--accent); }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
-  }
+  /* PAGES */
+  .page { display: none; padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bot) + 80px); min-height: 100dvh; }
+  .page.active { display: block; }
 
-  textarea, input[type=text], input[type=date], select {
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .label { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+
+  textarea, input[type=text], input[type=date], input[type=number], select {
     width: 100%; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; color: var(--text); font-size: 15px; padding: 11px 13px;
     font-family: inherit; outline: none; -webkit-appearance: none; transition: border-color .15s;
@@ -54,7 +51,7 @@
   select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
   select option { background: #1e1e1e; }
   textarea:focus, input:focus, select:focus { border-color: var(--border2); }
-  textarea { resize: none; min-height: 96px; line-height: 1.5; }
+  textarea { resize: none; min-height: 90px; line-height: 1.5; }
   input[type=date] { color-scheme: dark; }
 
   .parsed-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
@@ -67,13 +64,7 @@
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
-  .s-btn {
-    padding: 10px 8px; border-radius: 10px; font-size: 13px; font-weight: 600;
-    border: 2px solid transparent; cursor: pointer; text-align: center;
-    transition: all .15s;
-  }
-
-  /* Status colors - inactive */
+  .s-btn { padding: 10px 8px; border-radius: 10px; font-size: 13px; font-weight: 600; border: 2px solid transparent; cursor: pointer; text-align: center; transition: all .15s; }
   .s-called    { background: #0d1f14; color: #4a9e6a; }
   .s-closed    { background: #0d1a2e; color: #4a7abe; }
   .s-intalks   { background: #1a1a0d; color: #9e9e4a; }
@@ -81,8 +72,6 @@
   .s-followup  { background: #1a0f0d; color: #be7a4a; }
   .s-notint    { background: #1a0d0d; color: #9e4a4a; }
   .s-na        { background: #1a1a1a; color: #888; }
-
-  /* Status colors - active */
   .s-called.active    { border-color: #4a9e6a; background: #0d3020; color: #6dcc8e; }
   .s-closed.active    { border-color: #4a7abe; background: #0d2040; color: #6d9ede; }
   .s-intalks.active   { border-color: #9e9e4a; background: #2a2a0d; color: #cccc6d; }
@@ -91,14 +80,13 @@
   .s-notint.active    { border-color: #9e4a4a; background: #2a0d0d; color: #cc6d6d; }
   .s-na.active        { border-color: #888; background: #2a2a2a; color: #bbb; }
 
-  .submit {
-    position: fixed; bottom: calc(var(--safe-bot) + 16px); left: 16px; right: 16px;
-    background: var(--accent); color: #0a0a0a; border: none; border-radius: var(--radius);
-    font-size: 16px; font-weight: 700; padding: 16px; cursor: pointer;
-    letter-spacing: -0.2px; transition: opacity .15s, transform .1s;
+  .submit-btn {
+    width: 100%; background: var(--accent); color: #0a0a0a; border: none;
+    border-radius: var(--radius); font-size: 16px; font-weight: 700; padding: 16px;
+    cursor: pointer; margin-top: 4px; transition: opacity .15s, transform .1s;
   }
-  .submit:active { transform: scale(0.98); opacity: .85; }
-  .submit:disabled { opacity: .35; }
+  .submit-btn:active { transform: scale(0.98); opacity: .85; }
+  .submit-btn:disabled { opacity: .35; }
 
   .toast {
     position: fixed; top: calc(var(--safe-top) + 12px); left: 50%;
@@ -111,98 +99,289 @@
   .toast.ok  { color: #7fff7f; }
   .toast.err { color: #ff7f7f; }
 
-  .edit-hint { font-size: 11px; color: #555; margin-top: 6px; }
+  /* LEADS TAB */
+  .search-bar { position: relative; margin-bottom: 12px; }
+  .search-bar input { padding-left: 36px; }
+  .search-bar svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .4; }
+  .lead-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .lead-info { flex: 1; min-width: 0; }
+  .lead-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lead-detail { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lead-date { font-size: 11px; color: #555; margin-top: 4px; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+  .pill-called    { background: #0d3020; color: #6dcc8e; }
+  .pill-closed    { background: #0d2040; color: #6d9ede; }
+  .pill-in-talks  { background: #2a2a0d; color: #cccc6d; }
+  .pill-future    { background: #2a0d2a; color: #cc6dcc; }
+  .pill-follow-up { background: #2a180d; color: #de9e6d; }
+  .pill-not-interested { background: #2a0d0d; color: #cc6d6d; }
+  .pill-na        { background: #2a2a2a; color: #bbb; }
+  .empty-state { text-align: center; color: var(--muted); padding: 60px 20px; font-size: 14px; }
+
+  /* BIDDER TAB */
+  .bid-total { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; text-align: center; }
+  .bid-amount { font-size: 52px; font-weight: 800; color: var(--accent); letter-spacing: -2px; line-height: 1; }
+  .bid-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .counter-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .counter-row:last-child { border-bottom: none; }
+  .counter-label { font-size: 14px; font-weight: 500; }
+  .counter-sub { font-size: 12px; color: var(--muted); }
+  .counter-controls { display: flex; align-items: center; gap: 0; }
+  .cnt-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 20px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .1s; }
+  .cnt-btn:active { background: var(--border2); }
+  .cnt-val { min-width: 36px; text-align: center; font-size: 16px; font-weight: 700; }
+  .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .price-row label { font-size: 14px; white-space: nowrap; color: var(--muted); }
+  .price-row input { flex: 1; }
+  .bid-actions { display: flex; gap: 10px; margin-top: 4px; }
+  .bid-actions button { flex: 1; padding: 14px; border-radius: var(--radius); font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: opacity .15s; }
+  .btn-reset { background: var(--surface2); color: var(--muted); border: 1px solid var(--border) !important; }
+  .btn-export { background: var(--accent); color: #0a0a0a; }
+  .btn-export:active, .btn-reset:active { opacity: .7; }
+
+  /* PDF export styles (hidden, used for print) */
+  #pdfContent { display: none; }
+  @media print {
+    body > *:not(#pdfContent) { display: none !important; }
+    #pdfContent {
+      display: block !important; font-family: Arial, sans-serif;
+      padding: 40px; color: #000; max-width: 700px; margin: 0 auto;
+    }
+    .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 2px solid #000; padding-bottom: 16px; }
+    .pdf-title { font-size: 28px; font-weight: 800; }
+    .pdf-sub { font-size: 13px; color: #666; margin-top: 4px; }
+    .pdf-date { font-size: 13px; color: #666; text-align: right; }
+    .pdf-section { margin-bottom: 24px; }
+    .pdf-section-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #888; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+    .pdf-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
+    .pdf-row:last-child { border: none; }
+    .pdf-total-row { display: flex; justify-content: space-between; padding: 12px 0; font-size: 20px; font-weight: 800; border-top: 2px solid #000; margin-top: 8px; }
+    .pdf-footer { margin-top: 48px; font-size: 12px; color: #888; text-align: center; border-top: 1px solid #eee; padding-top: 16px; }
+  }
 </style>
 </head>
 <body>
 
-<h1>Lead Importer</h1>
-<p class="subtitle">Paste → tag → push to sheet</p>
+<!-- IMPORT PAGE -->
+<div class="page active" id="page-import">
+  <h1>Lead Importer</h1>
+  <p class="subtitle">Paste → tag → push to sheet</p>
 
-<div class="card">
-  <label class="label">Paste lead text</label>
-  <textarea id="rawLead" placeholder="Works with any format:&#10;&#10;Michael&#10;406 250 8080&#10;7454 e whistling wind way&#10;&#10;— or —&#10;&#10;Name: John Smith&#10;Phone: 602-555-1234&#10;Address: 123 Main St" oninput="parseLead()"></textarea>
-  <div class="parsed-row" id="parsedRow" style="display:none">
-    <div class="parsed-field">
-      <p class="pf-label">Name</p>
-      <p class="pf-val" id="pName">—</p>
-      <input type="text" id="eName" style="display:none;margin-top:6px;font-size:13px;padding:6px 8px" placeholder="Edit name" oninput="syncEdit('eName','pName')" />
-    </div>
-    <div class="parsed-field">
-      <p class="pf-label">Phone</p>
-      <p class="pf-val" id="pPhone">—</p>
-      <input type="text" id="ePhone" style="display:none;margin-top:6px;font-size:13px;padding:6px 8px" placeholder="Edit phone" oninput="syncEdit('ePhone','pPhone')" />
-    </div>
-    <div class="parsed-field full">
-      <p class="pf-label">Address</p>
-      <p class="pf-val" id="pAddr">—</p>
-      <input type="text" id="eAddr" style="display:none;margin-top:6px;font-size:13px;padding:6px 8px" placeholder="Edit address" oninput="syncEdit('eAddr','pAddr')" />
-    </div>
-    <div style="grid-column:1/-1;text-align:right">
-      <button onclick="toggleEdit()" style="background:none;border:none;color:#555;font-size:12px;cursor:pointer;text-decoration:underline" id="editBtn">Edit fields</button>
+  <div class="card">
+    <label class="label">Paste lead text</label>
+    <textarea id="rawLead" placeholder="Any format works:&#10;&#10;Michael&#10;406 250 8080&#10;7454 e whistling wind way&#10;&#10;— or —&#10;&#10;Name: John / Phone: 602-555-1234 / Address: 123 Main St" oninput="parseLead()"></textarea>
+    <div class="parsed-row" id="parsedRow" style="display:none">
+      <div class="parsed-field">
+        <p class="pf-label">Name</p>
+        <input type="text" id="eName" style="font-size:14px;padding:6px 8px;margin-top:4px" placeholder="Name" />
+      </div>
+      <div class="parsed-field">
+        <p class="pf-label">Phone</p>
+        <input type="text" id="ePhone" style="font-size:14px;padding:6px 8px;margin-top:4px" placeholder="Phone" />
+      </div>
+      <div class="parsed-field full">
+        <p class="pf-label">Address</p>
+        <input type="text" id="eAddr" style="font-size:14px;padding:6px 8px;margin-top:4px" placeholder="Address" />
+      </div>
     </div>
   </div>
-</div>
 
-<div class="card">
-  <label class="label">Status</label>
-  <div class="status-grid">
-    <button class="s-btn s-called"   onclick="setStatus(this,'Called')">Called</button>
-    <button class="s-btn s-closed"   onclick="setStatus(this,'Closed')">Closed</button>
-    <button class="s-btn s-intalks"  onclick="setStatus(this,'In Talks')">In Talks</button>
-    <button class="s-btn s-future"   onclick="setStatus(this,'Future')">Future</button>
-    <button class="s-btn s-followup" onclick="setStatus(this,'Follow Up')">Follow Up</button>
-    <button class="s-btn s-notint"   onclick="setStatus(this,'Not Interested')">Not Interested</button>
-    <button class="s-btn s-na"       onclick="setStatus(this,'N/A')" style="grid-column:1/-1">N/A</button>
+  <div class="card">
+    <label class="label">Status</label>
+    <div class="status-grid">
+      <button class="s-btn s-called"   onclick="setStatus(this,'Called')">Called</button>
+      <button class="s-btn s-closed"   onclick="setStatus(this,'Closed')">Closed</button>
+      <button class="s-btn s-intalks"  onclick="setStatus(this,'In Talks')">In Talks</button>
+      <button class="s-btn s-future"   onclick="setStatus(this,'Future')">Future</button>
+      <button class="s-btn s-followup" onclick="setStatus(this,'Follow Up')">Follow Up</button>
+      <button class="s-btn s-notint"   onclick="setStatus(this,'Not Interested')">Not Interested</button>
+      <button class="s-btn s-na"       onclick="setStatus(this,'N/A')" style="grid-column:1/-1">N/A</button>
+    </div>
   </div>
+
+  <div class="card">
+    <div class="two-col">
+      <div>
+        <label class="label">Service</label>
+        <select id="service">
+          <option value="">Select...</option>
+          <option>Window Cleaning</option>
+          <option>Pressure Washing</option>
+          <option>Gutter Cleaning</option>
+          <option>Solar Panel Cleaning</option>
+          <option>Roof Cleaning</option>
+          <option>House Washing</option>
+          <option>Screen Cleaning</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Quote $</label>
+        <input type="text" id="quote" placeholder="350" />
+      </div>
+    </div>
+    <label class="label" style="margin-top:12px">Follow-up date</label>
+    <input type="date" id="fuDate" />
+    <label class="label" style="margin-top:12px">Notes</label>
+    <textarea id="notes" style="min-height:56px" placeholder="Any extra info..."></textarea>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitLead()">Add to Sheet</button>
 </div>
 
-<div class="card">
-  <div class="two-col">
-    <div>
-      <label class="label">Service</label>
-      <select id="service">
-        <option value="">Select service...</option>
-        <option>Window Cleaning</option>
-        <option>Pressure Washing</option>
-        <option>Gutter Cleaning</option>
-        <option>Solar Panel Cleaning</option>
-        <option>Roof Cleaning</option>
-        <option>House Washing</option>
-        <option>Driveway Cleaning</option>
-        <option>Christmas Lights</option>
-        <option>Other</option>
+<!-- LEADS PAGE -->
+<div class="page" id="page-leads">
+  <h1>My Leads</h1>
+  <p class="subtitle" id="leadCount">0 leads saved locally</p>
+
+  <div class="search-bar">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Search leads..." oninput="renderLeads(this.value)" />
+  </div>
+
+  <div id="leadsList"></div>
+</div>
+
+<!-- BIDDER PAGE -->
+<div class="page" id="page-bidder">
+  <h1>Window Bidder</h1>
+  <p class="subtitle">Count panes, set price, get quote</p>
+
+  <div class="bid-total">
+    <div class="bid-amount" id="bidTotal">$0</div>
+    <div class="bid-label" id="bidBreakdown">0 panes × $0.00</div>
+  </div>
+
+  <div class="card">
+    <label class="label">Price per pane</label>
+    <div class="price-row">
+      <label>Outside only $</label>
+      <input type="number" id="priceOut" value="5" min="1" max="99" step="0.5" oninput="calcBid()" style="max-width:90px;text-align:center" />
+    </div>
+    <div class="price-row">
+      <label>In + Out $</label>
+      <input type="number" id="priceInOut" value="8" min="1" max="99" step="0.5" oninput="calcBid()" style="max-width:90px;text-align:center" />
+    </div>
+    <div class="price-row">
+      <label>Mode</label>
+      <select id="priceMode" onchange="calcBid()" style="max-width:160px">
+        <option value="out">Outside only</option>
+        <option value="inout">Inside + Outside</option>
       </select>
     </div>
-    <div>
-      <label class="label">Quote $</label>
-      <input type="text" id="quote" placeholder="350" />
+  </div>
+
+  <div class="card">
+    <label class="label">Pane Counter</label>
+    <div class="counter-row">
+      <div><div class="counter-label">Standard Panes</div><div class="counter-sub">Regular size windows</div></div>
+      <div class="counter-controls">
+        <button class="cnt-btn" onclick="adj('standard',-1)">−</button>
+        <div class="cnt-val" id="v-standard">0</div>
+        <button class="cnt-btn" onclick="adj('standard',1)">+</button>
+      </div>
+    </div>
+    <div class="counter-row">
+      <div><div class="counter-label">Large Panes</div><div class="counter-sub">Sliding doors, picture windows</div></div>
+      <div class="counter-controls">
+        <button class="cnt-btn" onclick="adj('large',-1)">−</button>
+        <div class="cnt-val" id="v-large">0</div>
+        <button class="cnt-btn" onclick="adj('large',1)">+</button>
+      </div>
+    </div>
+    <div class="counter-row">
+      <div><div class="counter-label">Screens</div><div class="counter-sub">Optional add-on</div></div>
+      <div class="counter-controls">
+        <button class="cnt-btn" onclick="adj('screens',-1)">−</button>
+        <div class="cnt-val" id="v-screens">0</div>
+        <button class="cnt-btn" onclick="adj('screens',1)">+</button>
+      </div>
     </div>
   </div>
-  <label class="label" style="margin-top:12px">Follow-up date</label>
-  <input type="date" id="fuDate" />
-  <label class="label" style="margin-top:12px">Notes</label>
-  <textarea id="notes" style="min-height:60px" placeholder="Any extra info..."></textarea>
+
+  <div class="card">
+    <label class="label">Screen price each $</label>
+    <input type="number" id="priceScreen" value="3" min="0" max="50" step="0.5" oninput="calcBid()" />
+    <label class="label" style="margin-top:12px">Large pane multiplier</label>
+    <select id="largeMulti" onchange="calcBid()">
+      <option value="1.5">1.5× standard</option>
+      <option value="2" selected>2× standard</option>
+      <option value="2.5">2.5× standard</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <label class="label">Client name (for PDF)</label>
+    <input type="text" id="bidClient" placeholder="John Smith" />
+    <label class="label" style="margin-top:12px">Address (for PDF)</label>
+    <input type="text" id="bidAddr" placeholder="123 Main St" />
+  </div>
+
+  <div class="bid-actions">
+    <button class="btn-reset" onclick="resetBid()">Reset</button>
+    <button class="btn-export" onclick="exportPDF()">Export PDF Quote</button>
+  </div>
 </div>
 
-<button class="submit" id="submitBtn" onclick="submitLead()">Add to Sheet</button>
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('import',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" d="M12 4v16m-8-8h16"/></svg>
+    Import
+  </button>
+  <button class="tab-btn" onclick="switchTab('leads',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    Leads
+  </button>
+  <button class="tab-btn" onclick="switchTab('bidder',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+    Bidder
+  </button>
+</div>
+
+<!-- PDF CONTENT (print only) -->
+<div id="pdfContent">
+  <div class="pdf-header">
+    <div>
+      <div class="pdf-title">Window Cleaning Quote</div>
+      <div class="pdf-sub" id="pdf-client"></div>
+      <div class="pdf-sub" id="pdf-addr"></div>
+    </div>
+    <div class="pdf-date" id="pdf-date"></div>
+  </div>
+  <div class="pdf-section">
+    <div class="pdf-section-title">Quote Breakdown</div>
+    <div id="pdf-rows"></div>
+    <div class="pdf-total-row">
+      <span>Total</span>
+      <span id="pdf-total"></span>
+    </div>
+  </div>
+  <div class="pdf-footer">Thank you for your business! · Valley Shine Pro</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMR_ITSxi2772JJCR7xKDiAyROYm-O7fZUXbwvhOaTysdmtQeBIp3rCajd2BUhDSZK/exec';
 let selectedStatus = '';
-let editMode = false;
+let leads = JSON.parse(localStorage.getItem('leads') || '[]');
+let counts = { standard: 0, large: 0, screens: 0 };
 
-// Phone regex
+/* ── TAB NAV ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'leads') renderLeads();
+}
+
+/* ── PARSING ── */
 const PHONE_RE = /(\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4})/;
-
-// Address indicators
-const ADDR_WORDS = /\b(st|ave|blvd|dr|rd|ln|way|ct|pl|cir|loop|trail|pkwy|hwy|route|rt|\d{3,5})\b/i;
+const ADDR_WORDS = /\b(st|ave|blvd|dr|rd|ln|way|ct|pl|cir|loop|trail|pkwy|hwy|\d{4,5})\b/i;
 
 function smartParse(raw) {
-  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-
-  // Try labeled first
   const extract = (keys) => {
     for (const k of keys) {
       const m = raw.match(new RegExp(k + '\\s*[:\\-]\\s*(.+)', 'i'));
@@ -210,38 +389,15 @@ function smartParse(raw) {
     }
     return '';
   };
+  let name = extract(['name']), phone = extract(['phone','cell','number','#','tel']), address = extract(['address','addr','location']);
+  if (name || phone || address) return { name, phone, address };
 
-  let name    = extract(['name']);
-  let phone   = extract(['phone','cell','number','#','tel']);
-  let address = extract(['address','addr','location']);
-
-  // If labeled format found something, return it
-  if (name || phone || address) {
-    return { name, phone, address };
-  }
-
-  // Smart unlabeled parsing
-  let remainingLines = [...lines];
-
-  // Find phone line
-  const phoneIdx = remainingLines.findIndex(l => PHONE_RE.test(l));
-  if (phoneIdx !== -1) {
-    phone = remainingLines[phoneIdx].match(PHONE_RE)[1];
-    remainingLines.splice(phoneIdx, 1);
-  }
-
-  // Find address line (has street number + keyword)
-  const addrIdx = remainingLines.findIndex(l => /^\d+/.test(l) || ADDR_WORDS.test(l));
-  if (addrIdx !== -1) {
-    address = remainingLines[addrIdx];
-    remainingLines.splice(addrIdx, 1);
-  }
-
-  // First remaining line is the name
-  if (remainingLines.length > 0) {
-    name = remainingLines[0];
-  }
-
+  let lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  const pi = lines.findIndex(l => PHONE_RE.test(l));
+  if (pi !== -1) { phone = lines[pi].match(PHONE_RE)[1]; lines.splice(pi, 1); }
+  const ai = lines.findIndex(l => /^\d+/.test(l) || ADDR_WORDS.test(l));
+  if (ai !== -1) { address = lines[ai]; lines.splice(ai, 1); }
+  if (lines.length) name = lines[0];
   return { name, phone, address };
 }
 
@@ -250,58 +406,26 @@ function parseLead() {
   const row = document.getElementById('parsedRow');
   if (!raw) { row.style.display = 'none'; return; }
   row.style.display = 'grid';
-
   const { name, phone, address } = smartParse(raw);
-
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    el.textContent = val || '—';
-    el.className = 'pf-val' + (val ? '' : ' empty');
-  };
-  set('pName', name);
-  set('pPhone', phone);
-  set('pAddr', address);
-
-  // Sync edit fields too
   document.getElementById('eName').value = name;
   document.getElementById('ePhone').value = phone;
   document.getElementById('eAddr').value = address;
 }
 
-function syncEdit(inputId, displayId) {
-  document.getElementById(displayId).textContent = document.getElementById(inputId).value || '—';
-}
-
-function toggleEdit() {
-  editMode = !editMode;
-  ['eName','ePhone','eAddr'].forEach(id => {
-    document.getElementById(id).style.display = editMode ? 'block' : 'none';
-  });
-  document.getElementById('editBtn').textContent = editMode ? 'Done editing' : 'Edit fields';
-}
-
+/* ── STATUS ── */
 function setStatus(btn, s) {
   selectedStatus = s;
   document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-function today() {
-  return new Date().toLocaleDateString('en-US', { month:'numeric', day:'numeric', year:'numeric' });
-}
+/* ── SUBMIT ── */
+function today() { return new Date().toLocaleDateString('en-US', { month:'numeric', day:'numeric', year:'numeric' }); }
 
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + type;
-  t.classList.add('show');
+  t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-function getField(editId, displayId) {
-  const editVal = document.getElementById(editId).value.trim();
-  const displayVal = document.getElementById(displayId).textContent;
-  return editVal || (displayVal === '—' ? '' : displayVal);
 }
 
 async function submitLead() {
@@ -309,32 +433,34 @@ async function submitLead() {
   if (!raw)            { showToast('Paste a lead first', 'err'); return; }
   if (!selectedStatus) { showToast('Pick a status', 'err'); return; }
 
-  const name    = getField('eName', 'pName') || 'Unknown';
-  const phone   = getField('ePhone', 'pPhone');
-  const address = getField('eAddr', 'pAddr');
+  const name    = document.getElementById('eName').value.trim() || 'Unknown';
+  const phone   = document.getElementById('ePhone').value.trim();
+  const address = document.getElementById('eAddr').value.trim();
   const service = document.getElementById('service').value;
   const rawQ    = document.getElementById('quote').value.trim();
   const quote   = rawQ ? (rawQ.startsWith('$') ? rawQ : '$' + rawQ) : '';
   const fuRaw   = document.getElementById('fuDate').value;
   const fuDate  = fuRaw ? new Date(fuRaw + 'T12:00:00').toLocaleDateString('en-US') : '';
   const notes   = document.getElementById('notes').value.trim();
+  const dateStr = today();
 
-  const row = [today(), name, phone, address, service, quote, selectedStatus, fuDate, notes];
+  const row = [dateStr, name, phone, address, service, quote, selectedStatus, fuDate, notes];
 
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Adding…';
+  btn.disabled = true; btn.textContent = 'Adding…';
 
   try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ row })
-    });
+    await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ row }) });
+
+    // Save locally too
+    leads.unshift({ date: dateStr, name, phone, address, service, quote, status: selectedStatus, fuDate, notes });
+    localStorage.setItem('leads', JSON.stringify(leads));
 
     showToast('Lead added! ✓', 'ok');
     document.getElementById('rawLead').value = '';
+    document.getElementById('eName').value = '';
+    document.getElementById('ePhone').value = '';
+    document.getElementById('eAddr').value = '';
     document.getElementById('service').value = '';
     document.getElementById('quote').value = '';
     document.getElementById('fuDate').value = '';
@@ -342,15 +468,104 @@ async function submitLead() {
     document.getElementById('parsedRow').style.display = 'none';
     document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
     selectedStatus = '';
-    editMode = false;
+  } catch(e) { showToast('Network error', 'err'); }
 
-  } catch(e) {
-    showToast('Network error — check connection', 'err');
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Add to Sheet';
+  btn.disabled = false; btn.textContent = 'Add to Sheet';
 }
+
+/* ── LEADS TAB ── */
+function pillClass(status) {
+  const map = { 'Called':'called','Closed':'closed','In Talks':'in-talks','Future':'future','Follow Up':'follow-up','Not Interested':'not-interested','N/A':'na' };
+  return 'pill-' + (map[status] || 'na');
+}
+
+function renderLeads(filter) {
+  const q = (filter || '').toLowerCase();
+  const filtered = leads.filter(l =>
+    !q || [l.name,l.phone,l.address,l.status,l.service].join(' ').toLowerCase().includes(q)
+  );
+  document.getElementById('leadCount').textContent = leads.length + ' lead' + (leads.length !== 1 ? 's' : '') + ' saved';
+  const el = document.getElementById('leadsList');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty-state">' + (leads.length ? 'No matches found' : 'No leads yet — import one!') + '</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(l => `
+    <div class="lead-card">
+      <div class="lead-info">
+        <div class="lead-name">${l.name || 'Unknown'}</div>
+        <div class="lead-detail">${l.phone || ''}${l.phone && l.address ? ' · ' : ''}${l.address || ''}</div>
+        ${l.service || l.quote ? `<div class="lead-detail" style="margin-top:2px">${l.service || ''}${l.service && l.quote ? ' · ' : ''}${l.quote || ''}</div>` : ''}
+        <div class="lead-date">${l.date || ''}</div>
+      </div>
+      <span class="status-pill ${pillClass(l.status)}">${l.status}</span>
+    </div>
+  `).join('');
+}
+
+/* ── BIDDER ── */
+function adj(key, delta) {
+  counts[key] = Math.max(0, counts[key] + delta);
+  document.getElementById('v-' + key).textContent = counts[key];
+  calcBid();
+}
+
+function calcBid() {
+  const mode = document.getElementById('priceMode').value;
+  const pricePerPane = parseFloat(document.getElementById(mode === 'out' ? 'priceOut' : 'priceInOut').value) || 0;
+  const screenPrice  = parseFloat(document.getElementById('priceScreen').value) || 0;
+  const largeMult    = parseFloat(document.getElementById('largeMulti').value) || 2;
+
+  const stdCost    = counts.standard * pricePerPane;
+  const largeCost  = counts.large * pricePerPane * largeMult;
+  const screenCost = counts.screens * screenPrice;
+  const total      = stdCost + largeCost + screenCost;
+  const totalPanes = counts.standard + counts.large;
+
+  document.getElementById('bidTotal').textContent = '$' + total.toFixed(0);
+  document.getElementById('bidBreakdown').textContent =
+    totalPanes + ' pane' + (totalPanes !== 1 ? 's' : '') +
+    (counts.screens ? ' + ' + counts.screens + ' screen' + (counts.screens !== 1 ? 's' : '') : '') +
+    ' = $' + total.toFixed(2);
+}
+
+function resetBid() {
+  counts = { standard: 0, large: 0, screens: 0 };
+  ['standard','large','screens'].forEach(k => document.getElementById('v-' + k).textContent = '0');
+  document.getElementById('bidClient').value = '';
+  document.getElementById('bidAddr').value = '';
+  calcBid();
+}
+
+function exportPDF() {
+  const mode = document.getElementById('priceMode').value;
+  const pricePerPane = parseFloat(document.getElementById(mode === 'out' ? 'priceOut' : 'priceInOut').value) || 0;
+  const screenPrice  = parseFloat(document.getElementById('priceScreen').value) || 0;
+  const largeMult    = parseFloat(document.getElementById('largeMulti').value) || 2;
+  const modeLabel    = mode === 'out' ? 'Outside Only' : 'Inside + Outside';
+
+  const stdCost    = counts.standard * pricePerPane;
+  const largeCost  = counts.large * pricePerPane * largeMult;
+  const screenCost = counts.screens * screenPrice;
+  const total      = stdCost + largeCost + screenCost;
+
+  document.getElementById('pdf-client').textContent = document.getElementById('bidClient').value || 'Client';
+  document.getElementById('pdf-addr').textContent   = document.getElementById('bidAddr').value || '';
+  document.getElementById('pdf-date').textContent   = 'Date: ' + today();
+  document.getElementById('pdf-total').textContent  = '$' + total.toFixed(2);
+
+  let rows = '';
+  if (counts.standard) rows += `<div class="pdf-row"><span>${counts.standard} Standard Pane${counts.standard>1?'s':''} (${modeLabel}) × $${pricePerPane.toFixed(2)}</span><span>$${stdCost.toFixed(2)}</span></div>`;
+  if (counts.large)    rows += `<div class="pdf-row"><span>${counts.large} Large Pane${counts.large>1?'s':''} (${modeLabel}) × $${(pricePerPane*largeMult).toFixed(2)}</span><span>$${largeCost.toFixed(2)}</span></div>`;
+  if (counts.screens)  rows += `<div class="pdf-row"><span>${counts.screens} Screen${counts.screens>1?'s':''} × $${screenPrice.toFixed(2)}</span><span>$${screenCost.toFixed(2)}</span></div>`;
+  if (!rows) rows = '<div class="pdf-row"><span>No items added</span><span>$0.00</span></div>';
+  document.getElementById('pdf-rows').innerHTML = rows;
+
+  window.print();
+}
+
+calcBid();
+renderLeads();
 </script>
 </body>
 </html>
