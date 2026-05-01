@@ -17,84 +17,65 @@
   }
   body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; min-height: 100dvh; font-size: 16px; overflow-x: hidden; }
 
-  /* TAB BAR */
-  .tab-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--surface); border-top: 1px solid var(--border);
-    display: flex; padding-bottom: var(--safe-bot); z-index: 100;
-  }
-  .tab-btn {
-    flex: 1; padding: 12px 4px 10px; background: none; border: none;
-    color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .05em;
-    text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column;
-    align-items: center; gap: 4px; transition: color .15s;
-  }
+  .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bot); z-index: 100; }
+  .tab-btn { flex: 1; padding: 12px 4px 10px; background: none; border: none; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color .15s; }
   .tab-btn svg { width: 22px; height: 22px; }
   .tab-btn.active { color: var(--accent); }
 
-  /* PAGES */
   .page { display: none; padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bot) + 80px); min-height: 100dvh; }
   .page.active { display: block; }
 
   h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
   .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-
   .label { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
-
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
 
-  textarea, input[type=text], input[type=date], input[type=number], select {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text); font-size: 15px; padding: 11px 13px;
-    font-family: inherit; outline: none; -webkit-appearance: none; transition: border-color .15s;
+  textarea, input[type=text], input[type=date], input[type=number], input[type=datetime-local], select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 15px; padding: 11px 13px; font-family: inherit;
+    outline: none; -webkit-appearance: none; transition: border-color .15s;
   }
   select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
   select option { background: #1e1e1e; }
   textarea:focus, input:focus, select:focus { border-color: var(--border2); }
   textarea { resize: none; min-height: 90px; line-height: 1.5; }
-  input[type=date] { color-scheme: dark; }
+  input[type=date], input[type=datetime-local] { color-scheme: dark; }
 
   .parsed-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
   .parsed-field { background: var(--surface2); border-radius: 10px; padding: 9px 12px; }
   .parsed-field.full { grid-column: 1 / -1; }
-  .pf-label { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 2px; }
-  .pf-val { font-size: 14px; font-weight: 500; color: var(--text); }
-  .pf-val.empty { color: #555; font-style: italic; font-weight: 400; }
+  .pf-label { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
 
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
   .s-btn { padding: 10px 8px; border-radius: 10px; font-size: 13px; font-weight: 600; border: 2px solid transparent; cursor: pointer; text-align: center; transition: all .15s; }
-  .s-called    { background: #0d1f14; color: #4a9e6a; }
-  .s-closed    { background: #0d1a2e; color: #4a7abe; }
-  .s-intalks   { background: #1a1a0d; color: #9e9e4a; }
-  .s-future    { background: #1a0d1a; color: #9e4a9e; }
-  .s-followup  { background: #1a0f0d; color: #be7a4a; }
-  .s-notint    { background: #1a0d0d; color: #9e4a4a; }
-  .s-na        { background: #1a1a1a; color: #888; }
-  .s-called.active    { border-color: #4a9e6a; background: #0d3020; color: #6dcc8e; }
-  .s-closed.active    { border-color: #4a7abe; background: #0d2040; color: #6d9ede; }
-  .s-intalks.active   { border-color: #9e9e4a; background: #2a2a0d; color: #cccc6d; }
-  .s-future.active    { border-color: #9e4a9e; background: #2a0d2a; color: #cc6dcc; }
-  .s-followup.active  { border-color: #be7a4a; background: #2a180d; color: #de9e6d; }
-  .s-notint.active    { border-color: #9e4a4a; background: #2a0d0d; color: #cc6d6d; }
-  .s-na.active        { border-color: #888; background: #2a2a2a; color: #bbb; }
+  .s-called     { background: #0d1f14; color: #4a9e6a; }
+  .s-closed     { background: #0d1a2e; color: #4a7abe; }
+  .s-intalks    { background: #1a1a0d; color: #9e9e4a; }
+  .s-future     { background: #1a0d1a; color: #9e4a9e; }
+  .s-followup   { background: #1a0f0d; color: #be7a4a; }
+  .s-notint     { background: #1a0d0d; color: #9e4a4a; }
+  .s-scheduled  { background: #1a1208; color: #d4943a; }
+  .s-na         { background: #1a1a1a; color: #888; }
+  .s-called.active     { border-color: #4a9e6a; background: #0d3020; color: #6dcc8e; }
+  .s-closed.active     { border-color: #4a7abe; background: #0d2040; color: #6d9ede; }
+  .s-intalks.active    { border-color: #9e9e4a; background: #2a2a0d; color: #cccc6d; }
+  .s-future.active     { border-color: #9e4a9e; background: #2a0d2a; color: #cc6dcc; }
+  .s-followup.active   { border-color: #be7a4a; background: #2a180d; color: #de9e6d; }
+  .s-notint.active     { border-color: #9e4a4a; background: #2a0d0d; color: #cc6d6d; }
+  .s-scheduled.active  { border-color: #d4943a; background: #2a1e08; color: #f0b860; }
+  .s-na.active         { border-color: #888; background: #2a2a2a; color: #bbb; }
 
-  .submit-btn {
-    width: 100%; background: var(--accent); color: #0a0a0a; border: none;
-    border-radius: var(--radius); font-size: 16px; font-weight: 700; padding: 16px;
-    cursor: pointer; margin-top: 4px; transition: opacity .15s, transform .1s;
-  }
+  .cal-picker { margin-top: 10px; display: none; }
+  .cal-picker.show { display: block; }
+  .cal-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  .submit-btn { width: 100%; background: var(--accent); color: #0a0a0a; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 700; padding: 16px; cursor: pointer; margin-top: 4px; transition: opacity .15s, transform .1s; }
   .submit-btn:active { transform: scale(0.98); opacity: .85; }
   .submit-btn:disabled { opacity: .35; }
 
-  .toast {
-    position: fixed; top: calc(var(--safe-top) + 12px); left: 50%;
-    transform: translateX(-50%) translateY(-80px);
-    background: var(--surface2); border: 1px solid var(--border2);
-    border-radius: 999px; padding: 10px 20px; font-size: 14px; font-weight: 500;
-    white-space: nowrap; transition: transform .3s cubic-bezier(.34,1.56,.64,1); z-index: 999;
-  }
+  .toast { position: fixed; top: calc(var(--safe-top) + 12px); left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--surface2); border: 1px solid var(--border2); border-radius: 999px; padding: 10px 20px; font-size: 14px; font-weight: 500; white-space: nowrap; transition: transform .3s cubic-bezier(.34,1.56,.64,1); z-index: 999; }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.ok  { color: #7fff7f; }
   .toast.err { color: #ff7f7f; }
@@ -102,23 +83,30 @@
   /* LEADS TAB */
   .search-bar { position: relative; margin-bottom: 12px; }
   .search-bar input { padding-left: 36px; }
-  .search-bar svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .4; }
+  .search-bar svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); opacity: .4; pointer-events: none; }
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .filter-btn { padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all .15s; }
+  .filter-btn.active { background: var(--accent); color: #0a0a0a; border-color: var(--accent); }
   .lead-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
   .lead-info { flex: 1; min-width: 0; }
   .lead-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lead-detail { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lead-date { font-size: 11px; color: #555; margin-top: 4px; }
   .status-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
-  .pill-called    { background: #0d3020; color: #6dcc8e; }
-  .pill-closed    { background: #0d2040; color: #6d9ede; }
-  .pill-in-talks  { background: #2a2a0d; color: #cccc6d; }
-  .pill-future    { background: #2a0d2a; color: #cc6dcc; }
-  .pill-follow-up { background: #2a180d; color: #de9e6d; }
-  .pill-not-interested { background: #2a0d0d; color: #cc6d6d; }
-  .pill-na        { background: #2a2a2a; color: #bbb; }
+  .pill-called        { background: #0d3020; color: #6dcc8e; }
+  .pill-closed        { background: #0d2040; color: #6d9ede; }
+  .pill-in-talks      { background: #2a2a0d; color: #cccc6d; }
+  .pill-future        { background: #2a0d2a; color: #cc6dcc; }
+  .pill-follow-up     { background: #2a180d; color: #de9e6d; }
+  .pill-not-interested{ background: #2a0d0d; color: #cc6d6d; }
+  .pill-scheduled     { background: #2a1e08; color: #f0b860; }
+  .pill-na            { background: #2a2a2a; color: #bbb; }
   .empty-state { text-align: center; color: var(--muted); padding: 60px 20px; font-size: 14px; }
+  .sync-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .sync-btn { font-size: 12px; padding: 6px 14px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; }
+  .sync-btn:active { opacity: .7; }
 
-  /* BIDDER TAB */
+  /* BIDDER */
   .bid-total { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; text-align: center; }
   .bid-amount { font-size: 52px; font-weight: 800; color: var(--accent); letter-spacing: -2px; line-height: 1; }
   .bid-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -127,26 +115,21 @@
   .counter-label { font-size: 14px; font-weight: 500; }
   .counter-sub { font-size: 12px; color: var(--muted); }
   .counter-controls { display: flex; align-items: center; gap: 0; }
-  .cnt-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 20px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .1s; }
+  .cnt-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 20px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .cnt-btn:active { background: var(--border2); }
   .cnt-val { min-width: 36px; text-align: center; font-size: 16px; font-weight: 700; }
   .price-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .price-row label { font-size: 14px; white-space: nowrap; color: var(--muted); }
   .price-row input { flex: 1; }
   .bid-actions { display: flex; gap: 10px; margin-top: 4px; }
-  .bid-actions button { flex: 1; padding: 14px; border-radius: var(--radius); font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: opacity .15s; }
-  .btn-reset { background: var(--surface2); color: var(--muted); border: 1px solid var(--border) !important; }
+  .bid-actions button { flex: 1; padding: 14px; border-radius: var(--radius); font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
+  .btn-reset  { background: var(--surface2); color: var(--muted); border: 1px solid var(--border) !important; }
   .btn-export { background: var(--accent); color: #0a0a0a; }
   .btn-export:active, .btn-reset:active { opacity: .7; }
 
-  /* PDF export styles (hidden, used for print) */
-  #pdfContent { display: none; }
   @media print {
     body > *:not(#pdfContent) { display: none !important; }
-    #pdfContent {
-      display: block !important; font-family: Arial, sans-serif;
-      padding: 40px; color: #000; max-width: 700px; margin: 0 auto;
-    }
+    #pdfContent { display: block !important; font-family: Arial, sans-serif; padding: 40px; color: #000; max-width: 700px; margin: 0 auto; }
     .pdf-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 2px solid #000; padding-bottom: 16px; }
     .pdf-title { font-size: 28px; font-weight: 800; }
     .pdf-sub { font-size: 13px; color: #666; margin-top: 4px; }
@@ -154,7 +137,6 @@
     .pdf-section { margin-bottom: 24px; }
     .pdf-section-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #888; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
     .pdf-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
-    .pdf-row:last-child { border: none; }
     .pdf-total-row { display: flex; justify-content: space-between; padding: 12px 0; font-size: 20px; font-weight: 800; border-top: 2px solid #000; margin-top: 8px; }
     .pdf-footer { margin-top: 48px; font-size: 12px; color: #888; text-align: center; border-top: 1px solid #eee; padding-top: 16px; }
   }
@@ -169,19 +151,19 @@
 
   <div class="card">
     <label class="label">Paste lead text</label>
-    <textarea id="rawLead" placeholder="Any format works:&#10;&#10;Michael&#10;406 250 8080&#10;7454 e whistling wind way&#10;&#10;— or —&#10;&#10;Name: John / Phone: 602-555-1234 / Address: 123 Main St" oninput="parseLead()"></textarea>
+    <textarea id="rawLead" placeholder="Any format:&#10;&#10;Michael&#10;406 250 8080&#10;7454 e whistling wind way&#10;&#10;— or —&#10;&#10;Name: John / Phone: 602-555-1234 / Address: 123 Main" oninput="parseLead()"></textarea>
     <div class="parsed-row" id="parsedRow" style="display:none">
       <div class="parsed-field">
         <p class="pf-label">Name</p>
-        <input type="text" id="eName" style="font-size:14px;padding:6px 8px;margin-top:4px" placeholder="Name" />
+        <input type="text" id="eName" style="font-size:14px;padding:6px 8px" placeholder="Name" />
       </div>
       <div class="parsed-field">
         <p class="pf-label">Phone</p>
-        <input type="text" id="ePhone" style="font-size:14px;padding:6px 8px;margin-top:4px" placeholder="Phone" />
+        <input type="text" id="ePhone" style="font-size:14px;padding:6px 8px" placeholder="Phone" />
       </div>
       <div class="parsed-field full">
         <p class="pf-label">Address</p>
-        <input type="text" id="eAddr" style="font-size:14px;padding:6px 8px;margin-top:4px" placeholder="Address" />
+        <input type="text" id="eAddr" style="font-size:14px;padding:6px 8px" placeholder="Address" />
       </div>
     </div>
   </div>
@@ -189,13 +171,19 @@
   <div class="card">
     <label class="label">Status</label>
     <div class="status-grid">
-      <button class="s-btn s-called"   onclick="setStatus(this,'Called')">Called</button>
-      <button class="s-btn s-closed"   onclick="setStatus(this,'Closed')">Closed</button>
-      <button class="s-btn s-intalks"  onclick="setStatus(this,'In Talks')">In Talks</button>
-      <button class="s-btn s-future"   onclick="setStatus(this,'Future')">Future</button>
-      <button class="s-btn s-followup" onclick="setStatus(this,'Follow Up')">Follow Up</button>
-      <button class="s-btn s-notint"   onclick="setStatus(this,'Not Interested')">Not Interested</button>
-      <button class="s-btn s-na"       onclick="setStatus(this,'N/A')" style="grid-column:1/-1">N/A</button>
+      <button class="s-btn s-called"    onclick="setStatus(this,'Called')">Called</button>
+      <button class="s-btn s-closed"    onclick="setStatus(this,'Closed')">Closed</button>
+      <button class="s-btn s-intalks"   onclick="setStatus(this,'In Talks')">In Talks</button>
+      <button class="s-btn s-future"    onclick="setStatus(this,'Future')">Future</button>
+      <button class="s-btn s-followup"  onclick="setStatus(this,'Follow Up')">Follow Up</button>
+      <button class="s-btn s-notint"    onclick="setStatus(this,'Not Interested')">Not Interested</button>
+      <button class="s-btn s-scheduled" onclick="setStatus(this,'Scheduled')" style="grid-column:1/-1">📅 Scheduled</button>
+      <button class="s-btn s-na"        onclick="setStatus(this,'N/A')" style="grid-column:1/-1">N/A</button>
+    </div>
+    <div class="cal-picker" id="calPicker">
+      <label class="label" style="margin-top:10px">Appointment date & time</label>
+      <input type="datetime-local" id="schedDatetime" />
+      <p class="cal-hint">📆 A Google Calendar event will be created automatically</p>
     </div>
   </div>
 
@@ -232,11 +220,25 @@
 <!-- LEADS PAGE -->
 <div class="page" id="page-leads">
   <h1>My Leads</h1>
-  <p class="subtitle" id="leadCount">0 leads saved locally</p>
+  <div class="sync-row">
+    <p class="subtitle" id="leadCount" style="margin:0">Loading...</p>
+    <button class="sync-btn" onclick="fetchLeads()">↻ Sync</button>
+  </div>
 
   <div class="search-bar">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
-    <input type="text" placeholder="Search leads..." oninput="renderLeads(this.value)" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Search by name, phone, address..." oninput="renderLeads(this.value)" />
+  </div>
+
+  <div class="filter-row" id="filterRow">
+    <button class="filter-btn active" onclick="setFilter('All',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('Called',this)">Called</button>
+    <button class="filter-btn" onclick="setFilter('Closed',this)">Closed</button>
+    <button class="filter-btn" onclick="setFilter('In Talks',this)">In Talks</button>
+    <button class="filter-btn" onclick="setFilter('Follow Up',this)">Follow Up</button>
+    <button class="filter-btn" onclick="setFilter('Scheduled',this)">Scheduled</button>
+    <button class="filter-btn" onclick="setFilter('Future',this)">Future</button>
+    <button class="filter-btn" onclick="setFilter('Not Interested',this)">Not Interested</button>
   </div>
 
   <div id="leadsList"></div>
@@ -339,8 +341,8 @@
   </button>
 </div>
 
-<!-- PDF CONTENT (print only) -->
-<div id="pdfContent">
+<!-- PDF (print only) -->
+<div id="pdfContent" style="display:none">
   <div class="pdf-header">
     <div>
       <div class="pdf-title">Window Cleaning Quote</div>
@@ -350,12 +352,9 @@
     <div class="pdf-date" id="pdf-date"></div>
   </div>
   <div class="pdf-section">
-    <div class="pdf-section-title">Quote Breakdown</div>
+    <div class="pdf-section-title">Breakdown</div>
     <div id="pdf-rows"></div>
-    <div class="pdf-total-row">
-      <span>Total</span>
-      <span id="pdf-total"></span>
-    </div>
+    <div class="pdf-total-row"><span>Total</span><span id="pdf-total"></span></div>
   </div>
   <div class="pdf-footer">Thank you for your business! · Valley Shine Pro</div>
 </div>
@@ -365,19 +364,20 @@
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMR_ITSxi2772JJCR7xKDiAyROYm-O7fZUXbwvhOaTysdmtQeBIp3rCajd2BUhDSZK/exec';
 let selectedStatus = '';
-let leads = JSON.parse(localStorage.getItem('leads') || '[]');
-let counts = { standard: 0, large: 0, screens: 0 };
+let leads = [];
+let activeFilter = 'All';
+let counts = { standard:0, large:0, screens:0 };
 
-/* ── TAB NAV ── */
+/* ── TABS ── */
 function switchTab(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'leads') renderLeads();
+  if (name === 'leads') fetchLeads();
 }
 
-/* ── PARSING ── */
+/* ── PARSE ── */
 const PHONE_RE = /(\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4})/;
 const ADDR_WORDS = /\b(st|ave|blvd|dr|rd|ln|way|ct|pl|cir|loop|trail|pkwy|hwy|\d{4,5})\b/i;
 
@@ -391,12 +391,11 @@ function smartParse(raw) {
   };
   let name = extract(['name']), phone = extract(['phone','cell','number','#','tel']), address = extract(['address','addr','location']);
   if (name || phone || address) return { name, phone, address };
-
   let lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
   const pi = lines.findIndex(l => PHONE_RE.test(l));
-  if (pi !== -1) { phone = lines[pi].match(PHONE_RE)[1]; lines.splice(pi, 1); }
+  if (pi !== -1) { phone = lines[pi].match(PHONE_RE)[1]; lines.splice(pi,1); }
   const ai = lines.findIndex(l => /^\d+/.test(l) || ADDR_WORDS.test(l));
-  if (ai !== -1) { address = lines[ai]; lines.splice(ai, 1); }
+  if (ai !== -1) { address = lines[ai]; lines.splice(ai,1); }
   if (lines.length) name = lines[0];
   return { name, phone, address };
 }
@@ -404,8 +403,8 @@ function smartParse(raw) {
 function parseLead() {
   const raw = document.getElementById('rawLead').value.trim();
   const row = document.getElementById('parsedRow');
-  if (!raw) { row.style.display = 'none'; return; }
-  row.style.display = 'grid';
+  if (!raw) { row.style.display='none'; return; }
+  row.style.display='grid';
   const { name, phone, address } = smartParse(raw);
   document.getElementById('eName').value = name;
   document.getElementById('ePhone').value = phone;
@@ -417,10 +416,11 @@ function setStatus(btn, s) {
   selectedStatus = s;
   document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  document.getElementById('calPicker').classList.toggle('show', s === 'Scheduled');
 }
 
 /* ── SUBMIT ── */
-function today() { return new Date().toLocaleDateString('en-US', { month:'numeric', day:'numeric', year:'numeric' }); }
+function today() { return new Date().toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'}); }
 
 function showToast(msg, type) {
   const t = document.getElementById('toast');
@@ -430,142 +430,166 @@ function showToast(msg, type) {
 
 async function submitLead() {
   const raw = document.getElementById('rawLead').value.trim();
-  if (!raw)            { showToast('Paste a lead first', 'err'); return; }
-  if (!selectedStatus) { showToast('Pick a status', 'err'); return; }
+  if (!raw)            { showToast('Paste a lead first','err'); return; }
+  if (!selectedStatus) { showToast('Pick a status','err'); return; }
+  if (selectedStatus === 'Scheduled' && !document.getElementById('schedDatetime').value) {
+    showToast('Pick a date & time for the appointment','err'); return;
+  }
 
   const name    = document.getElementById('eName').value.trim() || 'Unknown';
   const phone   = document.getElementById('ePhone').value.trim();
   const address = document.getElementById('eAddr').value.trim();
   const service = document.getElementById('service').value;
   const rawQ    = document.getElementById('quote').value.trim();
-  const quote   = rawQ ? (rawQ.startsWith('$') ? rawQ : '$' + rawQ) : '';
+  const quote   = rawQ ? (rawQ.startsWith('$') ? rawQ : '$'+rawQ) : '';
   const fuRaw   = document.getElementById('fuDate').value;
-  const fuDate  = fuRaw ? new Date(fuRaw + 'T12:00:00').toLocaleDateString('en-US') : '';
+  const fuDate  = fuRaw ? new Date(fuRaw+'T12:00:00').toLocaleDateString('en-US') : '';
   const notes   = document.getElementById('notes').value.trim();
   const dateStr = today();
-
   const row = [dateStr, name, phone, address, service, quote, selectedStatus, fuDate, notes];
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'Adding…';
 
   try {
-    await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ row }) });
+    // Add to sheet
+    await fetch(SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'addLead', row })
+    });
 
-    // Save locally too
-    leads.unshift({ date: dateStr, name, phone, address, service, quote, status: selectedStatus, fuDate, notes });
-    localStorage.setItem('leads', JSON.stringify(leads));
+    // If scheduled, add calendar event
+    if (selectedStatus === 'Scheduled') {
+      const dt = document.getElementById('schedDatetime').value;
+      await fetch(SCRIPT_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'addCalendar', name, phone, address, quote, notes, datetime: dt })
+      });
+      showToast('Lead added + Calendar event created ✓','ok');
+    } else {
+      showToast('Lead added! ✓','ok');
+    }
 
-    showToast('Lead added! ✓', 'ok');
+    // Reset
     document.getElementById('rawLead').value = '';
-    document.getElementById('eName').value = '';
-    document.getElementById('ePhone').value = '';
-    document.getElementById('eAddr').value = '';
+    ['eName','ePhone','eAddr','quote','fuDate','notes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('service').value = '';
-    document.getElementById('quote').value = '';
-    document.getElementById('fuDate').value = '';
-    document.getElementById('notes').value = '';
+    document.getElementById('schedDatetime').value = '';
     document.getElementById('parsedRow').style.display = 'none';
+    document.getElementById('calPicker').classList.remove('show');
     document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
     selectedStatus = '';
-  } catch(e) { showToast('Network error', 'err'); }
+
+  } catch(e) { showToast('Network error','err'); }
 
   btn.disabled = false; btn.textContent = 'Add to Sheet';
 }
 
 /* ── LEADS TAB ── */
+async function fetchLeads() {
+  document.getElementById('leadCount').textContent = 'Syncing…';
+  try {
+    const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
+    const data = await res.json();
+    leads = (data.leads || []).reverse(); // newest first
+    renderLeads();
+  } catch(e) {
+    document.getElementById('leadCount').textContent = 'Sync failed — check connection';
+  }
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeads(document.querySelector('.search-bar input').value);
+}
+
 function pillClass(status) {
-  const map = { 'Called':'called','Closed':'closed','In Talks':'in-talks','Future':'future','Follow Up':'follow-up','Not Interested':'not-interested','N/A':'na' };
+  const map = { 'Called':'called','Closed':'closed','In Talks':'in-talks','Future':'future','Follow Up':'follow-up','Not Interested':'not-interested','Scheduled':'scheduled','N/A':'na' };
   return 'pill-' + (map[status] || 'na');
 }
 
 function renderLeads(filter) {
   const q = (filter || '').toLowerCase();
-  const filtered = leads.filter(l =>
-    !q || [l.name,l.phone,l.address,l.status,l.service].join(' ').toLowerCase().includes(q)
-  );
-  document.getElementById('leadCount').textContent = leads.length + ' lead' + (leads.length !== 1 ? 's' : '') + ' saved';
+  let filtered = leads.filter(l => {
+    const matchSearch = !q || [l.name,l.phone,l.address,l.status,l.service].join(' ').toLowerCase().includes(q);
+    const matchFilter = activeFilter === 'All' || l.status === activeFilter;
+    return matchSearch && matchFilter;
+  });
+
+  document.getElementById('leadCount').textContent = leads.length + ' lead' + (leads.length !== 1 ? 's' : '') + ' in sheet';
   const el = document.getElementById('leadsList');
+
   if (!filtered.length) {
-    el.innerHTML = '<div class="empty-state">' + (leads.length ? 'No matches found' : 'No leads yet — import one!') + '</div>';
+    el.innerHTML = '<div class="empty-state">' + (leads.length ? 'No matches' : 'No leads yet') + '</div>';
     return;
   }
+
   el.innerHTML = filtered.map(l => `
     <div class="lead-card">
       <div class="lead-info">
-        <div class="lead-name">${l.name || 'Unknown'}</div>
-        <div class="lead-detail">${l.phone || ''}${l.phone && l.address ? ' · ' : ''}${l.address || ''}</div>
-        ${l.service || l.quote ? `<div class="lead-detail" style="margin-top:2px">${l.service || ''}${l.service && l.quote ? ' · ' : ''}${l.quote || ''}</div>` : ''}
-        <div class="lead-date">${l.date || ''}</div>
+        <div class="lead-name">${l.name||'Unknown'}</div>
+        <div class="lead-detail">${[l.phone,l.address].filter(Boolean).join(' · ')}</div>
+        ${l.service||l.quote ? `<div class="lead-detail">${[l.service,l.quote].filter(Boolean).join(' · ')}</div>` : ''}
+        ${l.notes ? `<div class="lead-detail" style="color:#666">${l.notes}</div>` : ''}
+        <div class="lead-date">${l.date||''}</div>
       </div>
-      <span class="status-pill ${pillClass(l.status)}">${l.status}</span>
+      <span class="status-pill ${pillClass(l.status)}">${l.status||'—'}</span>
     </div>
   `).join('');
 }
 
 /* ── BIDDER ── */
 function adj(key, delta) {
-  counts[key] = Math.max(0, counts[key] + delta);
-  document.getElementById('v-' + key).textContent = counts[key];
+  counts[key] = Math.max(0, counts[key]+delta);
+  document.getElementById('v-'+key).textContent = counts[key];
   calcBid();
 }
-
 function calcBid() {
   const mode = document.getElementById('priceMode').value;
-  const pricePerPane = parseFloat(document.getElementById(mode === 'out' ? 'priceOut' : 'priceInOut').value) || 0;
-  const screenPrice  = parseFloat(document.getElementById('priceScreen').value) || 0;
-  const largeMult    = parseFloat(document.getElementById('largeMulti').value) || 2;
-
-  const stdCost    = counts.standard * pricePerPane;
-  const largeCost  = counts.large * pricePerPane * largeMult;
-  const screenCost = counts.screens * screenPrice;
-  const total      = stdCost + largeCost + screenCost;
-  const totalPanes = counts.standard + counts.large;
-
-  document.getElementById('bidTotal').textContent = '$' + total.toFixed(0);
-  document.getElementById('bidBreakdown').textContent =
-    totalPanes + ' pane' + (totalPanes !== 1 ? 's' : '') +
-    (counts.screens ? ' + ' + counts.screens + ' screen' + (counts.screens !== 1 ? 's' : '') : '') +
-    ' = $' + total.toFixed(2);
+  const ppp  = parseFloat(document.getElementById(mode==='out'?'priceOut':'priceInOut').value)||0;
+  const sp   = parseFloat(document.getElementById('priceScreen').value)||0;
+  const lm   = parseFloat(document.getElementById('largeMulti').value)||2;
+  const sc   = counts.standard * ppp;
+  const lc   = counts.large * ppp * lm;
+  const skc  = counts.screens * sp;
+  const total = sc+lc+skc;
+  const tp   = counts.standard+counts.large;
+  document.getElementById('bidTotal').textContent = '$'+total.toFixed(0);
+  document.getElementById('bidBreakdown').textContent = tp+' pane'+(tp!==1?'s':'')+(counts.screens?' + '+counts.screens+' screen'+(counts.screens!==1?'s':''):'')+' = $'+total.toFixed(2);
 }
-
 function resetBid() {
-  counts = { standard: 0, large: 0, screens: 0 };
-  ['standard','large','screens'].forEach(k => document.getElementById('v-' + k).textContent = '0');
-  document.getElementById('bidClient').value = '';
-  document.getElementById('bidAddr').value = '';
+  counts={standard:0,large:0,screens:0};
+  ['standard','large','screens'].forEach(k=>document.getElementById('v-'+k).textContent='0');
+  document.getElementById('bidClient').value='';
+  document.getElementById('bidAddr').value='';
   calcBid();
 }
-
 function exportPDF() {
-  const mode = document.getElementById('priceMode').value;
-  const pricePerPane = parseFloat(document.getElementById(mode === 'out' ? 'priceOut' : 'priceInOut').value) || 0;
-  const screenPrice  = parseFloat(document.getElementById('priceScreen').value) || 0;
-  const largeMult    = parseFloat(document.getElementById('largeMulti').value) || 2;
-  const modeLabel    = mode === 'out' ? 'Outside Only' : 'Inside + Outside';
-
-  const stdCost    = counts.standard * pricePerPane;
-  const largeCost  = counts.large * pricePerPane * largeMult;
-  const screenCost = counts.screens * screenPrice;
-  const total      = stdCost + largeCost + screenCost;
-
-  document.getElementById('pdf-client').textContent = document.getElementById('bidClient').value || 'Client';
-  document.getElementById('pdf-addr').textContent   = document.getElementById('bidAddr').value || '';
-  document.getElementById('pdf-date').textContent   = 'Date: ' + today();
-  document.getElementById('pdf-total').textContent  = '$' + total.toFixed(2);
-
-  let rows = '';
-  if (counts.standard) rows += `<div class="pdf-row"><span>${counts.standard} Standard Pane${counts.standard>1?'s':''} (${modeLabel}) × $${pricePerPane.toFixed(2)}</span><span>$${stdCost.toFixed(2)}</span></div>`;
-  if (counts.large)    rows += `<div class="pdf-row"><span>${counts.large} Large Pane${counts.large>1?'s':''} (${modeLabel}) × $${(pricePerPane*largeMult).toFixed(2)}</span><span>$${largeCost.toFixed(2)}</span></div>`;
-  if (counts.screens)  rows += `<div class="pdf-row"><span>${counts.screens} Screen${counts.screens>1?'s':''} × $${screenPrice.toFixed(2)}</span><span>$${screenCost.toFixed(2)}</span></div>`;
-  if (!rows) rows = '<div class="pdf-row"><span>No items added</span><span>$0.00</span></div>';
-  document.getElementById('pdf-rows').innerHTML = rows;
-
+  const mode=document.getElementById('priceMode').value;
+  const ppp=parseFloat(document.getElementById(mode==='out'?'priceOut':'priceInOut').value)||0;
+  const sp=parseFloat(document.getElementById('priceScreen').value)||0;
+  const lm=parseFloat(document.getElementById('largeMulti').value)||2;
+  const ml=mode==='out'?'Outside Only':'Inside + Outside';
+  const sc=counts.standard*ppp, lc=counts.large*ppp*lm, skc=counts.screens*sp;
+  const total=sc+lc+skc;
+  document.getElementById('pdf-client').textContent=document.getElementById('bidClient').value||'Client';
+  document.getElementById('pdf-addr').textContent=document.getElementById('bidAddr').value||'';
+  document.getElementById('pdf-date').textContent='Date: '+today();
+  document.getElementById('pdf-total').textContent='$'+total.toFixed(2);
+  let rows='';
+  if(counts.standard) rows+=`<div class="pdf-row"><span>${counts.standard} Standard Pane${counts.standard>1?'s':''} (${ml}) × $${ppp.toFixed(2)}</span><span>$${sc.toFixed(2)}</span></div>`;
+  if(counts.large)    rows+=`<div class="pdf-row"><span>${counts.large} Large Pane${counts.large>1?'s':''} (${ml}) × $${(ppp*lm).toFixed(2)}</span><span>$${lc.toFixed(2)}</span></div>`;
+  if(counts.screens)  rows+=`<div class="pdf-row"><span>${counts.screens} Screen${counts.screens>1?'s':''} × $${sp.toFixed(2)}</span><span>$${skc.toFixed(2)}</span></div>`;
+  if(!rows) rows='<div class="pdf-row"><span>No items</span><span>$0.00</span></div>';
+  document.getElementById('pdf-rows').innerHTML=rows;
   window.print();
 }
 
 calcBid();
-renderLeads();
 </script>
 </body>
 </html>
