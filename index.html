@@ -81,8 +81,10 @@ input[type=date],input[type=datetime-local]{color-scheme:dark}
 .bid-tab.active{background:var(--accent);color:#0a0a0a;border-color:var(--accent)}
 .bid-view{display:none}.bid-view.active{display:block}
 @media print{
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-scheme:light!important}
+body{background:#fff!important;color:#000!important}
 body>*:not(#pdfContent){display:none!important}
-#pdfContent{display:block!important;font-family:Arial,sans-serif;padding:40px;color:#000;max-width:700px;margin:0 auto}
+#pdfContent{display:block!important;font-family:Arial,sans-serif;padding:40px;color:#000!important;background:#fff!important;max-width:700px;margin:0 auto}
 .pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;border-bottom:2px solid #1a3a6b;padding-bottom:16px}
 .pdf-logo{height:80px;object-fit:contain}
 .pdf-biz{text-align:right;font-size:12px;color:#444}
