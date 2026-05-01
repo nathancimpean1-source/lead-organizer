@@ -46,12 +46,14 @@
     border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
   }
 
-  textarea, input[type=text], input[type=date] {
+  textarea, input[type=text], input[type=date], select {
     width: 100%; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; color: var(--text); font-size: 15px; padding: 11px 13px;
     font-family: inherit; outline: none; -webkit-appearance: none; transition: border-color .15s;
   }
-  textarea:focus, input:focus { border-color: var(--border2); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  select option { background: #1e1e1e; }
+  textarea:focus, input:focus, select:focus { border-color: var(--border2); }
   textarea { resize: none; min-height: 96px; line-height: 1.5; }
   input[type=date] { color-scheme: dark; }
 
@@ -67,10 +69,27 @@
 
   .s-btn {
     padding: 10px 8px; border-radius: 10px; font-size: 13px; font-weight: 600;
-    border: 1.5px solid transparent; cursor: pointer; text-align: center;
-    transition: all .15s; background: var(--surface2); color: var(--muted);
+    border: 2px solid transparent; cursor: pointer; text-align: center;
+    transition: all .15s;
   }
-  .s-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(232,255,74,0.07); }
+
+  /* Status colors - inactive */
+  .s-called    { background: #0d1f14; color: #4a9e6a; }
+  .s-closed    { background: #0d1a2e; color: #4a7abe; }
+  .s-intalks   { background: #1a1a0d; color: #9e9e4a; }
+  .s-future    { background: #1a0d1a; color: #9e4a9e; }
+  .s-followup  { background: #1a0f0d; color: #be7a4a; }
+  .s-notint    { background: #1a0d0d; color: #9e4a4a; }
+  .s-na        { background: #1a1a1a; color: #888; }
+
+  /* Status colors - active */
+  .s-called.active    { border-color: #4a9e6a; background: #0d3020; color: #6dcc8e; }
+  .s-closed.active    { border-color: #4a7abe; background: #0d2040; color: #6d9ede; }
+  .s-intalks.active   { border-color: #9e9e4a; background: #2a2a0d; color: #cccc6d; }
+  .s-future.active    { border-color: #9e4a9e; background: #2a0d2a; color: #cc6dcc; }
+  .s-followup.active  { border-color: #be7a4a; background: #2a180d; color: #de9e6d; }
+  .s-notint.active    { border-color: #9e4a4a; background: #2a0d0d; color: #cc6d6d; }
+  .s-na.active        { border-color: #888; background: #2a2a2a; color: #bbb; }
 
   .submit {
     position: fixed; bottom: calc(var(--safe-bot) + 16px); left: 16px; right: 16px;
@@ -91,6 +110,8 @@
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.ok  { color: #7fff7f; }
   .toast.err { color: #ff7f7f; }
+
+  .edit-hint { font-size: 11px; color: #555; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -100,24 +121,39 @@
 
 <div class="card">
   <label class="label">Paste lead text</label>
-  <textarea id="rawLead" placeholder="Name: John Smith&#10;Address: 123 Main St&#10;Phone: 602-555-1234" oninput="parseLead()"></textarea>
+  <textarea id="rawLead" placeholder="Works with any format:&#10;&#10;Michael&#10;406 250 8080&#10;7454 e whistling wind way&#10;&#10;— or —&#10;&#10;Name: John Smith&#10;Phone: 602-555-1234&#10;Address: 123 Main St" oninput="parseLead()"></textarea>
   <div class="parsed-row" id="parsedRow" style="display:none">
-    <div class="parsed-field"><p class="pf-label">Name</p><p class="pf-val" id="pName">—</p></div>
-    <div class="parsed-field"><p class="pf-label">Phone</p><p class="pf-val" id="pPhone">—</p></div>
-    <div class="parsed-field full"><p class="pf-label">Address</p><p class="pf-val" id="pAddr">—</p></div>
+    <div class="parsed-field">
+      <p class="pf-label">Name</p>
+      <p class="pf-val" id="pName">—</p>
+      <input type="text" id="eName" style="display:none;margin-top:6px;font-size:13px;padding:6px 8px" placeholder="Edit name" oninput="syncEdit('eName','pName')" />
+    </div>
+    <div class="parsed-field">
+      <p class="pf-label">Phone</p>
+      <p class="pf-val" id="pPhone">—</p>
+      <input type="text" id="ePhone" style="display:none;margin-top:6px;font-size:13px;padding:6px 8px" placeholder="Edit phone" oninput="syncEdit('ePhone','pPhone')" />
+    </div>
+    <div class="parsed-field full">
+      <p class="pf-label">Address</p>
+      <p class="pf-val" id="pAddr">—</p>
+      <input type="text" id="eAddr" style="display:none;margin-top:6px;font-size:13px;padding:6px 8px" placeholder="Edit address" oninput="syncEdit('eAddr','pAddr')" />
+    </div>
+    <div style="grid-column:1/-1;text-align:right">
+      <button onclick="toggleEdit()" style="background:none;border:none;color:#555;font-size:12px;cursor:pointer;text-decoration:underline" id="editBtn">Edit fields</button>
+    </div>
   </div>
 </div>
 
 <div class="card">
   <label class="label">Status</label>
   <div class="status-grid">
-    <button class="s-btn" onclick="setStatus(this,'Called')">Called</button>
-    <button class="s-btn" onclick="setStatus(this,'Closed')">Closed</button>
-    <button class="s-btn" onclick="setStatus(this,'In Talks')">In Talks</button>
-    <button class="s-btn" onclick="setStatus(this,'Future')">Future</button>
-    <button class="s-btn" onclick="setStatus(this,'Follow Up')">Follow Up</button>
-    <button class="s-btn" onclick="setStatus(this,'Not Interested')">Not Interested</button>
-    <button class="s-btn" onclick="setStatus(this,'N/A')" style="grid-column:1/-1">N/A</button>
+    <button class="s-btn s-called"   onclick="setStatus(this,'Called')">Called</button>
+    <button class="s-btn s-closed"   onclick="setStatus(this,'Closed')">Closed</button>
+    <button class="s-btn s-intalks"  onclick="setStatus(this,'In Talks')">In Talks</button>
+    <button class="s-btn s-future"   onclick="setStatus(this,'Future')">Future</button>
+    <button class="s-btn s-followup" onclick="setStatus(this,'Follow Up')">Follow Up</button>
+    <button class="s-btn s-notint"   onclick="setStatus(this,'Not Interested')">Not Interested</button>
+    <button class="s-btn s-na"       onclick="setStatus(this,'N/A')" style="grid-column:1/-1">N/A</button>
   </div>
 </div>
 
@@ -125,7 +161,18 @@
   <div class="two-col">
     <div>
       <label class="label">Service</label>
-      <input type="text" id="service" placeholder="Window cleaning" />
+      <select id="service">
+        <option value="">Select service...</option>
+        <option>Window Cleaning</option>
+        <option>Pressure Washing</option>
+        <option>Gutter Cleaning</option>
+        <option>Solar Panel Cleaning</option>
+        <option>Roof Cleaning</option>
+        <option>House Washing</option>
+        <option>Driveway Cleaning</option>
+        <option>Christmas Lights</option>
+        <option>Other</option>
+      </select>
     </div>
     <div>
       <label class="label">Quote $</label>
@@ -144,13 +191,58 @@
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMR_ITSxi2772JJCR7xKDiAyROYm-O7fZUXbwvhOaTysdmtQeBIp3rCajd2BUhDSZK/exec';
 let selectedStatus = '';
+let editMode = false;
 
-function extract(raw, keys) {
-  for (const k of keys) {
-    const m = raw.match(new RegExp(k + '\\s*[:\\-]\\s*(.+)', 'i'));
-    if (m) return m[1].trim();
+// Phone regex
+const PHONE_RE = /(\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4})/;
+
+// Address indicators
+const ADDR_WORDS = /\b(st|ave|blvd|dr|rd|ln|way|ct|pl|cir|loop|trail|pkwy|hwy|route|rt|\d{3,5})\b/i;
+
+function smartParse(raw) {
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+
+  // Try labeled first
+  const extract = (keys) => {
+    for (const k of keys) {
+      const m = raw.match(new RegExp(k + '\\s*[:\\-]\\s*(.+)', 'i'));
+      if (m) return m[1].trim();
+    }
+    return '';
+  };
+
+  let name    = extract(['name']);
+  let phone   = extract(['phone','cell','number','#','tel']);
+  let address = extract(['address','addr','location']);
+
+  // If labeled format found something, return it
+  if (name || phone || address) {
+    return { name, phone, address };
   }
-  return '';
+
+  // Smart unlabeled parsing
+  let remainingLines = [...lines];
+
+  // Find phone line
+  const phoneIdx = remainingLines.findIndex(l => PHONE_RE.test(l));
+  if (phoneIdx !== -1) {
+    phone = remainingLines[phoneIdx].match(PHONE_RE)[1];
+    remainingLines.splice(phoneIdx, 1);
+  }
+
+  // Find address line (has street number + keyword)
+  const addrIdx = remainingLines.findIndex(l => /^\d+/.test(l) || ADDR_WORDS.test(l));
+  if (addrIdx !== -1) {
+    address = remainingLines[addrIdx];
+    remainingLines.splice(addrIdx, 1);
+  }
+
+  // First remaining line is the name
+  if (remainingLines.length > 0) {
+    name = remainingLines[0];
+  }
+
+  return { name, phone, address };
 }
 
 function parseLead() {
@@ -158,14 +250,34 @@ function parseLead() {
   const row = document.getElementById('parsedRow');
   if (!raw) { row.style.display = 'none'; return; }
   row.style.display = 'grid';
+
+  const { name, phone, address } = smartParse(raw);
+
   const set = (id, val) => {
     const el = document.getElementById(id);
     el.textContent = val || '—';
     el.className = 'pf-val' + (val ? '' : ' empty');
   };
-  set('pName',  extract(raw, ['name']));
-  set('pPhone', extract(raw, ['phone','cell','number','#']));
-  set('pAddr',  extract(raw, ['address','addr','location']));
+  set('pName', name);
+  set('pPhone', phone);
+  set('pAddr', address);
+
+  // Sync edit fields too
+  document.getElementById('eName').value = name;
+  document.getElementById('ePhone').value = phone;
+  document.getElementById('eAddr').value = address;
+}
+
+function syncEdit(inputId, displayId) {
+  document.getElementById(displayId).textContent = document.getElementById(inputId).value || '—';
+}
+
+function toggleEdit() {
+  editMode = !editMode;
+  ['eName','ePhone','eAddr'].forEach(id => {
+    document.getElementById(id).style.display = editMode ? 'block' : 'none';
+  });
+  document.getElementById('editBtn').textContent = editMode ? 'Done editing' : 'Edit fields';
 }
 
 function setStatus(btn, s) {
@@ -186,15 +298,21 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
+function getField(editId, displayId) {
+  const editVal = document.getElementById(editId).value.trim();
+  const displayVal = document.getElementById(displayId).textContent;
+  return editVal || (displayVal === '—' ? '' : displayVal);
+}
+
 async function submitLead() {
   const raw = document.getElementById('rawLead').value.trim();
   if (!raw)            { showToast('Paste a lead first', 'err'); return; }
   if (!selectedStatus) { showToast('Pick a status', 'err'); return; }
 
-  const name    = extract(raw, ['name']) || 'Unknown';
-  const phone   = extract(raw, ['phone','cell','number','#']) || '';
-  const address = extract(raw, ['address','addr','location']) || '';
-  const service = document.getElementById('service').value.trim();
+  const name    = getField('eName', 'pName') || 'Unknown';
+  const phone   = getField('ePhone', 'pPhone');
+  const address = getField('eAddr', 'pAddr');
+  const service = document.getElementById('service').value;
   const rawQ    = document.getElementById('quote').value.trim();
   const quote   = rawQ ? (rawQ.startsWith('$') ? rawQ : '$' + rawQ) : '';
   const fuRaw   = document.getElementById('fuDate').value;
@@ -224,6 +342,7 @@ async function submitLead() {
     document.getElementById('parsedRow').style.display = 'none';
     document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
     selectedStatus = '';
+    editMode = false;
 
   } catch(e) {
     showToast('Network error — check connection', 'err');
